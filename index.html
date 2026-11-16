@@ -977,7 +977,6 @@
       bar.style.background = realPct > 100 ? 'var(--red)' : (realPct > 80 ? 'var(--orange)' : 'var(--primary)');
       document.getElementById('budget-spent-pct').textContent = `${realPct} % z limitu`;
 
-      // Denný limit do konca mesiaca
       const dailyBox = document.getElementById('daily-allowance-box');
       const dailyLbl = document.getElementById('daily-allowance-label');
       const dailyVal = document.getElementById('daily-allowance-val');
@@ -1015,15 +1014,12 @@
         dailyVal.textContent = `${fmtEur(state.budget / daysInMonth)} / deň`;
       }
 
-      // Donut & Legend
       renderDonutAndLegend(monthExpenses, total);
 
-      // Filter Chips
       const chipsWrap = document.getElementById('filter-chips');
       chipsWrap.innerHTML = `<button class="chip ${activeFilter === 'all' ? 'active' : ''}" onclick="setFilter('all')">Všetky</button>` +
         CATEGORIES.map(c => `<button class="chip ${activeFilter === c.id ? 'active' : ''}" onclick="setFilter('${c.id}')">${c.icon} ${c.name}</button>`).join('');
 
-      // Filtered & Searched List
       const query = document.getElementById('search-input').value.trim().toLowerCase();
       let filtered = monthExpenses;
       if (activeFilter !== 'all') {
@@ -1110,12 +1106,10 @@
     }
 
     function renderStatsView() {
-      // Category selector chips
       const chipsWrap = document.getElementById('stats-cat-chips');
       chipsWrap.innerHTML = `<button class="chip ${statsCategory === 'all' ? 'active' : ''}" onclick="setStatsCat('all')">Všetky spolu</button>` +
         CATEGORIES.map(c => `<button class="chip ${statsCategory === c.id ? 'active' : ''}" onclick="setStatsCat('${c.id}')">${c.icon} ${c.name}</button>`).join('');
 
-      // Last 6 months array
       const months = [];
       const [baseY, baseM] = selectedMonth.split('-').map(Number);
       for (let i = 5; i >= 0; i--) {
@@ -1156,7 +1150,6 @@
       }
       document.getElementById('stat-diff').textContent = diffText;
 
-      // Savings
       const totalSav = state.savings.reduce((s, x) => s + Number(x.amount), 0);
       document.getElementById('total-savings').textContent = fmtEur(totalSav);
       document.getElementById('savings-goal-text').textContent = `Cieľ: ${fmtEur(state.savingsGoal)}`;
@@ -1278,7 +1271,6 @@
       renderAll();
     }
 
-    // Recurring templates
     function renderRecurringModal() {
       const sel = document.getElementById('rec-cat');
       sel.innerHTML = CATEGORIES.map(c => `<option value="${c.id}">${c.icon} ${c.name}</option>`).join('');
@@ -1348,7 +1340,6 @@
       renderAll();
     }
 
-    // Savings
     function setSavType(mult) {
       savMultiplier = mult;
       document.getElementById('sav-type-in').classList.toggle('selected', mult === 1);
@@ -1382,7 +1373,6 @@
       renderAll();
     }
 
-    // Modals helpers
     function openModal(id) {
       if (id === 'modal-recurring') renderRecurringModal();
       document.getElementById(id).classList.add('open');
@@ -1394,7 +1384,6 @@
       if (e.target.id === id) closeModal(id);
     }
 
-    // Export / Import / Reset
     function downloadFile(filename, content, mime) {
       const blob = new Blob([content], { type: mime });
       const url = URL.createObjectURL(blob);
@@ -1411,15 +1400,14 @@
       const rows = [['Datum', 'Kategoria', 'Suma_EUR', 'Poznamka']];
       state.expenses.forEach(e => {
         const cat = CATEGORIES.find(c => c.id === e.category)?.name || e.category;
-        rows.push([e.date, `"${cat}"`, Number(e.amount).toFixed(2), `"${(e.note || '').replace(/"/g, '""')}"`]);
+        rows.push([e.date, '"' + cat + '"', Number(e.amount).toFixed(2), '"' + (e.note || '').replace(/"/g, '""') + '"']);
       });
-      const csv = '﻿' + rows.map(r => r.join(';')).join('
-');
-      downloadFile(`vydavky_${selectedMonth}.csv`, csv, 'text/csv;charset=utf-8;');
+      const csv = '\uFEFF' + rows.map(r => r.join(';')).join('\n');
+      downloadFile('vydavky_' + selectedMonth + '.csv', csv, 'text/csv;charset=utf-8;');
     }
 
     function exportJSON() {
-      downloadFile(`moje_vydavky_zaloha_${new Date().toISOString().slice(0,10)}.json`, JSON.stringify(state, null, 2), 'application/json');
+      downloadFile('moje_vydavky_zaloha_' + new Date().toISOString().slice(0,10) + '.json', JSON.stringify(state, null, 2), 'application/json');
     }
 
     function importJSON(e) {
