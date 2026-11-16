@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Moje Výdavky" />
+  <title>Moje Výdavky</title>
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23007AFF'/%3E%3Cstop offset='100%25' stop-color='%230051D5'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='40' fill='url(%23g)'/%3E%3Ctext x='90' y='118' font-size='88' text-anchor='middle' fill='white' font-family='-apple-system, sans-serif' font-weight='700'%3E%E2%82%AC%3C/text%3E%3C/svg%3E" />
+  <style>
+    :root {
+      --bg: #F2F2F7;
+      --card: #FFFFFF;
+      --text: #1C1C1E;
+      --subtext: #8E8E93;
+      --border: #E5E5EA;
+      --primary: #007AFF;
+      --primary-light: rgba(0, 122, 255, 0.12);
+      --green: #34C759;
+      --orange: #FF9500;
+      --red: #FF3B30;
+      --purple: #AF52DE;
+      --teal: #00C7BE;
+      --gray: #8E8E93;
+      --safe-top: env(safe-area-inset-top, 20px);
+      --safe-bottom: env(safe-area-inset-bottom, 20px);
+    }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg);
+      color: var(--text);
+      padding-top: var(--safe-top);
+      padding-bottom: calc(145px + var(--safe-bottom));
+      overscroll-behavior-y: none;
+    }
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 12px 16px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    h1 {
+      font-size: 26px;
+      font-weight: 800;
+      margin: 0;
+      letter-spacing: -0.5px;
+    }
+    .icon-btn {
+      background: var(--card);
+      border: none;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      cursor: pointer;
+      color: var(--text);
+    }
+    .month-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--card);
+      border-radius: 14px;
+      padding: 8px 12px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .month-btn {
+      background: var(--bg);
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--primary);
+      cursor: pointer;
+    }
+    .month-label {
+      font-weight: 700;
+      font-size: 16px;
+      text-transform: capitalize;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    }
+    .summary-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+    .summary-label {
+      font-size: 13px;
+      color: var(--subtext);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .summary-amount {
+      font-size: 32px;
+      font-weight: 800;
+      margin-top: 2px;
+      letter-spacing: -0.8px;
+    }
+    .budget-edit-btn {
+      background: var(--primary-light);
+      color: var(--primary);
+      border: none;
+      padding: 6px 10px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .progress-wrap {
+      height: 10px;
+      background: var(--bg);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.3s ease, background-color 0.3s ease;
+    }
+    .budget-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--subtext);
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+    .daily-allowance {
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .daily-ok { background: rgba(52, 199, 89, 0.12); color: #1E8E3E; }
+    .daily-warn { background: rgba(255, 149, 0, 0.14); color: #B26200; }
+    .daily-over { background: rgba(255, 59, 48, 0.12); color: #C62828; }
+    .daily-neutral { background: var(--bg); color: var(--subtext); }
+
+    .chart-section {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .donut-wrap {
+      position: relative;
+      width: 124px;
+      height: 124px;
+      flex-shrink: 0;
+    }
+    .donut-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .donut-center span {
+      font-size: 11px;
+      color: var(--subtext);
+      font-weight: 600;
+    }
+    .donut-center strong {
+      font-size: 16px;
+      font-weight: 800;
+    }
+    .legend {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .legend-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+    }
+    .legend-left {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-weight: 500;
+    }
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .legend-val {
+      font-weight: 700;
+    }
+
+    .search-box {
+      position: relative;
+      margin-bottom: 10px;
+    }
+    .search-input {
+      width: 100%;
+      padding: 10px 36px 10px 36px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      font-size: 15px;
+      color: var(--text);
+      outline: none;
+    }
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 15px;
+      color: var(--subtext);
+    }
+    .search-clear {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--bg);
+      border: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      font-size: 12px;
+      color: var(--subtext);
+      cursor: pointer;
+      display: none;
+    }
+
+    .chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 8px;
+      scrollbar-width: none;
+    }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 99px;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      color: var(--text);
+    }
+    .chip.active {
+      background: var(--text);
+      color: #FFFFFF;
+      border-color: var(--text);
+    }
+
+    .list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 6px 2px 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--subtext);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .tx-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .tx-item {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    }
+    .tx-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .tx-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+      flex-shrink: 0;
+    }
+    .tx-info {
+      min-width: 0;
+    }
+    .tx-title {
+      font-weight: 600;
+      font-size: 15px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .tx-sub {
+      font-size: 12px;
+      color: var(--subtext);
+      margin-top: 2px;
+    }
+    .tx-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .tx-amount {
+      font-weight: 700;
+      font-size: 16px;
+    }
+    .del-btn {
+      background: none;
+      border: none;
+      color: #C7C7CC;
+      font-size: 18px;
+      padding: 4px;
+      cursor: pointer;
+    }
+
+    /* Floating Action Buttons */
+    .fab-bar {
+      position: fixed;
+      bottom: calc(64px + var(--safe-bottom));
+      left: 0;
+      right: 0;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0 16px;
+      display: flex;
+      gap: 10px;
+      z-index: 40;
+      pointer-events: none;
+    }
+    .fab-bar button {
+      pointer-events: auto;
+      border: none;
+      border-radius: 16px;
+      padding: 14px 16px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.14);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-recurring {
+      background: var(--card);
+      color: var(--text);
+      flex: 0 0 auto;
+    }
+    .btn-add {
+      background: var(--primary);
+      color: #FFFFFF;
+      flex: 1;
+    }
+
+    /* Bottom Tab Bar */
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      padding-bottom: var(--safe-bottom);
+      height: calc(56px + var(--safe-bottom));
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 50;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      color: var(--subtext);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      flex: 1;
+      height: 100%;
+    }
+    .tab-btn.active {
+      color: var(--primary);
+    }
+    .tab-icon {
+      font-size: 20px;
+    }
+
+    /* Bar Chart (Stats) */
+    .bars-wrap {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      height: 165px;
+      padding-top: 24px;
+      gap: 8px;
+    }
+    .bar-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+      justify-content: flex-end;
+      cursor: pointer;
+    }
+    .bar-val {
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+    .bar-rect {
+      width: 100%;
+      max-width: 36px;
+      border-radius: 8px 8px 4px 4px;
+      min-height: 4px;
+      transition: height 0.3s ease;
+    }
+    .bar-lbl {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--subtext);
+      margin-top: 6px;
+      text-transform: capitalize;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .stat-box {
+      background: var(--bg);
+      padding: 10px 12px;
+      border-radius: 12px;
+    }
+    .stat-box span {
+      font-size: 11px;
+      color: var(--subtext);
+      font-weight: 600;
+      display: block;
+    }
+    .stat-box strong {
+      font-size: 16px;
+      font-weight: 800;
+      margin-top: 2px;
+      display: block;
+    }
+
+    /* Modals / Bottom Sheets */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 100;
+    }
+    .modal-backdrop.open {
+      display: flex;
+    }
+    .sheet {
+      background: var(--card);
+      width: 100%;
+      max-width: 480px;
+      border-radius: 22px 22px 0 0;
+      padding: 18px 18px calc(24px + var(--safe-bottom));
+      max-height: 88vh;
+      overflow-y: auto;
+      animation: slideUp 0.22s ease-out;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .sheet-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .sheet-title {
+      font-size: 19px;
+      font-weight: 800;
+      margin: 0;
+    }
+    .close-btn {
+      background: var(--bg);
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--subtext);
+      cursor: pointer;
+    }
+    .form-group {
+      margin-bottom: 14px;
+    }
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--subtext);
+      margin-bottom: 6px;
+    }
+    .input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      font-size: 16px;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+    }
+    .amount-input {
+      font-size: 28px;
+      font-weight: 800;
+      text-align: center;
+    }
+    .cat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .cat-option {
+      border: 2px solid var(--border);
+      background: var(--card);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .cat-option.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    .primary-btn {
+      width: 100%;
+      background: var(--primary);
+      color: #FFFFFF;
+      border: none;
+      padding: 14px;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+    .secondary-btn {
+      width: 100%;
+      background: var(--bg);
+      color: var(--text);
+      border: none;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+    .danger-btn {
+      width: 100%;
+      background: rgba(255, 59, 48, 0.12);
+      color: var(--red);
+      border: none;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+    .hidden { display: none !important; }
+    .empty-state {
+      text-align: center;
+      padding: 28px 16px;
+      color: var(--subtext);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- VIEW 1: VÝDAVKY -->
+  <div id="view-expenses" class="container">
+    <header>
+      <h1>Moje Výdavky</h1>
+      <button class="icon-btn" onclick="openModal('modal-settings')" aria-label="Nastavenia">⚙️</button>
+    </header>
+
+    <div class="month-bar">
+      <button class="month-btn" onclick="changeMonth(-1)">‹</button>
+      <div class="month-label" id="current-month-label">November 2026</div>
+      <button class="month-btn" onclick="changeMonth(1)">›</button>
+    </div>
+
+    <div class="card">
+      <div class="summary-top">
+        <div>
+          <div class="summary-label">Minuté tento mesiac</div>
+          <div class="summary-amount" id="total-spent">0,00 €</div>
+        </div>
+        <button class="budget-edit-btn" onclick="editBudget()">Upraviť limit</button>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-fill" id="budget-bar" style="width: 0%; background: var(--primary);"></div>
+      </div>
+      <div class="budget-meta">
+        <span id="budget-spent-pct">0 % z limitu</span>
+        <span id="budget-limit-text">Limit: 1 200,00 €</span>
+      </div>
+      <div class="daily-allowance daily-ok" id="daily-allowance-box">
+        <span id="daily-allowance-label">Denný limit do konca mesiaca</span>
+        <strong id="daily-allowance-val">0,00 € / deň</strong>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="chart-section">
+        <div class="donut-wrap">
+          <svg width="124" height="124" viewBox="0 0 124 124" id="donut-svg"></svg>
+          <div class="donut-center">
+            <span>Položiek</span>
+            <strong id="tx-count-center">0</strong>
+          </div>
+        </div>
+        <div class="legend" id="category-legend"></div>
+      </div>
+    </div>
+
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search-input" class="search-input" placeholder="Hľadať (napr. Shell, nájom, darček...)" oninput="onSearchInput()" />
+      <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
+    </div>
+
+    <div class="chips" id="filter-chips"></div>
+
+    <div class="list-header">
+      <span id="list-title">Posledné výdavky</span>
+      <span id="list-filtered-sum"></span>
+    </div>
+    <div class="tx-list" id="tx-list"></div>
+  </div>
+
+  <!-- VIEW 2: GRAFY & ÚSPORY -->
+  <div id="view-stats" class="container hidden">
+    <header>
+      <h1>Grafy &amp; Úspory</h1>
+      <button class="icon-btn" onclick="openModal('modal-settings')">⚙️</button>
+    </header>
+
+    <div class="card">
+      <div class="summary-label" style="margin-bottom: 8px;">Mesačný vývoj výdavkov (6 mesiacov)</div>
+      <div class="chips" id="stats-cat-chips"></div>
+      <div class="bars-wrap" id="expense-bars"></div>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <span>Mesačný priemer</span>
+          <strong id="stat-avg">0,00 €</strong>
+        </div>
+        <div class="stat-box">
+          <span>Aktuálny vs. minulý</span>
+          <strong id="stat-diff">0 %</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="summary-top">
+        <div>
+          <div class="summary-label">Celkové úspory</div>
+          <div class="summary-amount" style="color: var(--green);" id="total-savings">0,00 €</div>
+        </div>
+        <button class="budget-edit-btn" onclick="editSavingsGoal()">Cieľ úspor</button>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-fill" id="savings-bar" style="width: 0%; background: var(--green);"></div>
+      </div>
+      <div class="budget-meta">
+        <span id="savings-pct">0 % z cieľa</span>
+        <span id="savings-goal-text">Cieľ: 5 000,00 €</span>
+      </div>
+      <button class="primary-btn" style="background: var(--green); margin-top: 4px;" onclick="openModal('modal-savings')">+ Zaznamenať úsporu / výber</button>
+    </div>
+
+    <div class="list-header">
+      <span>História úspor</span>
+    </div>
+    <div class="tx-list" id="savings-list"></div>
+  </div>
+
+  <!-- FLOATING BUTTONS -->
+  <div class="fab-bar" id="fab-bar">
+    <button class="btn-recurring" onclick="openModal('modal-recurring')">🔁 Pravidelné</button>
+    <button class="btn-add" onclick="openAddModal()">+ Pridať výdavok</button>
+  </div>
+
+  <!-- BOTTOM TAB BAR -->
+  <nav class="tab-bar">
+    <button class="tab-btn active" id="tab-expenses" onclick="switchTab('expenses')">
+      <span class="tab-icon">💳</span>
+      <span>Výdavky</span>
+    </button>
+    <button class="tab-btn" id="tab-stats" onclick="switchTab('stats')">
+      <span class="tab-icon">📊</span>
+      <span>Grafy &amp; Úspory</span>
+    </button>
+  </nav>
+
+  <!-- MODAL: PRIDAŤ VÝDAVOK -->
+  <div class="modal-backdrop" id="modal-add" onclick="backdropClose(event, 'modal-add')">
+    <div class="sheet">
+      <div class="sheet-head">
+        <h2 class="sheet-title">Nový výdavok</h2>
+        <button class="close-btn" onclick="closeModal('modal-add')">✕</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Suma (€)</label>
+        <input type="number" inputmode="decimal" step="0.01" id="inp-amount" class="input amount-input" placeholder="0.00" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Kategória</label>
+        <div class="cat-grid" id="modal-cat-grid"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Poznámka (voliteľné)</label>
+        <input type="text" id="inp-note" class="input" placeholder="Napr. Nákup Lidl, Tankovanie..." />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Dátum</label>
+        <input type="date" id="inp-date" class="input" />
+      </div>
+      <button class="primary-btn" onclick="saveExpense()">Uložiť výdavok</button>
+    </div>
+  </div>
+
+  <!-- MODAL: PRAVIDELNÉ VÝDAVKY -->
+  <div class="modal-backdrop" id="modal-recurring" onclick="backdropClose(event, 'modal-recurring')">
+    <div class="sheet">
+      <div class="sheet-head">
+        <h2 class="sheet-title">🔁 Pravidelné výdavky</h2>
+        <button class="close-btn" onclick="closeModal('modal-recurring')">✕</button>
+      </div>
+      <p style="font-size: 13px; color: var(--subtext); margin-top: 0;">Nastav si stále mesačné platby a jedným kliknutím ich zapíš do vybraného mesiaca.</p>
+      <div id="recurring-list" class="tx-list" style="margin-bottom: 12px;"></div>
+      <button class="primary-btn" style="margin-bottom: 16px;" onclick="applyAllRecurring()">Zapísať všetko do mesiaca</button>
+
+      <div style="border-top: 1px solid var(--border); padding-top: 12px;">
+        <div class="form-label">Pridať novú pravidelnú položku</div>
+        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+          <input type="text" id="rec-name" class="input" placeholder="Názov (napr. Nájom)" style="flex: 2;" />
+          <input type="number" inputmode="decimal" step="0.01" id="rec-amount" class="input" placeholder="Suma €" style="flex: 1;" />
+        </div>
+        <select id="rec-cat" class="input" style="margin-bottom: 8px;"></select>
+        <button class="secondary-btn" onclick="addRecurringTemplate()">+ Uložiť šablónu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ÚSPORY -->
+  <div class="modal-backdrop" id="modal-savings" onclick="backdropClose(event, 'modal-savings')">
+    <div class="sheet">
+      <div class="sheet-head">
+        <h2 class="sheet-title">Zaznamenať úsporu</h2>
+        <button class="close-btn" onclick="closeModal('modal-savings')">✕</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Typ pohybu</label>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="cat-option selected" id="sav-type-in" style="flex:1; justify-content:center;" onclick="setSavType(1)">➕ Odložiť (vklad)</button>
+          <button type="button" class="cat-option" id="sav-type-out" style="flex:1; justify-content:center;" onclick="setSavType(-1)">➖ Vybrať z úspor</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Suma (€)</label>
+        <input type="number" inputmode="decimal" step="0.01" id="sav-amount" class="input amount-input" placeholder="0.00" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Poznámka</label>
+        <input type="text" id="sav-note" class="input" placeholder="Napr. Z výplaty, Rezerva..." />
+      </div>
+      <button class="primary-btn" style="background: var(--green);" onclick="saveSaving()">Uložiť záznam</button>
+    </div>
+  </div>
+
+  <!-- MODAL: NASTAVENIA A ZÁLOHA -->
+  <div class="modal-backdrop" id="modal-settings" onclick="backdropClose(event, 'modal-settings')">
+    <div class="sheet">
+      <div class="sheet-head">
+        <h2 class="sheet-title">Nastavenia &amp; Záloha</h2>
+        <button class="close-btn" onclick="closeModal('modal-settings')">✕</button>
+      </div>
+      <button class="secondary-btn" onclick="exportCSV()">📊 Exportovať do Excelu / Numbers (CSV)</button>
+      <button class="secondary-btn" onclick="exportJSON()">💾 Stiahnuť kompletnú zálohu (JSON)</button>
+      <button class="secondary-btn" onclick="document.getElementById('import-file').click()">📂 Obnoviť zo zálohy (JSON)</button>
+      <input type="file" id="import-file" accept=".json" class="hidden" onchange="importJSON(event)" />
+      <button class="danger-btn" onclick="clearAllData()">🗑️ Vymazať všetky dáta (začať načisto)</button>
+    </div>
+  </div>
+
+  <script>
+    const CATEGORIES = [
+      { id: 'pravidelne', name: 'Pravidelné výdavky', icon: '🏠', color: '#007AFF' },
+      { id: 'potraviny',  name: 'Potraviny / strava', icon: '🛒', color: '#34C759' },
+      { id: 'benzin',     name: 'Benzín',             icon: '⛽', color: '#FF9500' },
+      { id: 'restauracia',name: 'Reštaurácia',        icon: '🍽️', color: '#AF52DE' },
+      { id: 'darceky',    name: 'Darčeky',            icon: '🎁', color: '#00C7BE' },
+      { id: 'ine',        name: 'Iné',                icon: '📦', color: '#8E8E93' }
+    ];
+
+    const STORAGE_KEY = 'moje_vydavky_v3';
+
+    function getCurrentMonthStr() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    }
+
+    function getDefaultState() {
+      const m = getCurrentMonthStr();
+      return {
+        budget: 1200,
+        savingsGoal: 5000,
+        expenses: [
+          { id: 1, amount: 450.00, category: 'pravidelne', note: 'Nájom a energie', date: `${m}-01` },
+          { id: 2, amount: 64.50,  category: 'potraviny',  note: 'Nákup potravín',  date: `${m}-04` },
+          { id: 3, amount: 52.00,  category: 'benzin',     note: 'Tankovanie plná', date: `${m}-06` },
+          { id: 4, amount: 24.80,  category: 'restauracia',note: 'Obed v meste',    date: `${m}-09` },
+          { id: 5, amount: 35.00,  category: 'darceky',    note: 'Darček narodeniny',date: `${m}-11` }
+        ],
+        recurring: [
+          { id: 101, name: 'Nájom a energie', amount: 450.00, category: 'pravidelne' },
+          { id: 102, name: 'Internet a mobil', amount: 32.00, category: 'pravidelne' }
+        ],
+        savings: [
+          { id: 201, amount: 300.00, note: 'Mesačná rezerva', date: `${m}-02` }
+        ]
+      };
+    }
+
+    let state = loadState();
+    let selectedMonth = getCurrentMonthStr();
+    let activeFilter = 'all';
+    let statsCategory = 'all';
+    let modalSelectedCat = 'potraviny';
+    let savMultiplier = 1;
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          return {
+            budget: parsed.budget ?? 1200,
+            savingsGoal: parsed.savingsGoal ?? 5000,
+            expenses: Array.isArray(parsed.expenses) ? parsed.expenses : [],
+            recurring: Array.isArray(parsed.recurring) ? parsed.recurring : [],
+            savings: Array.isArray(parsed.savings) ? parsed.savings : []
+          };
+        }
+      } catch (e) {}
+      return getDefaultState();
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function fmtEur(num) {
+      return Number(num || 0).toLocaleString('sk-SK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+    }
+
+    function formatMonthLabel(ym) {
+      const [y, m] = ym.split('-').map(Number);
+      const d = new Date(y, m - 1, 1);
+      return d.toLocaleDateString('sk-SK', { month: 'long', year: 'numeric' });
+    }
+
+    function changeMonth(delta) {
+      const [y, m] = selectedMonth.split('-').map(Number);
+      const d = new Date(y, m - 1 + delta, 1);
+      selectedMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      renderAll();
+    }
+
+    function switchTab(tab) {
+      document.getElementById('view-expenses').classList.toggle('hidden', tab !== 'expenses');
+      document.getElementById('view-stats').classList.toggle('hidden', tab !== 'stats');
+      document.getElementById('fab-bar').classList.toggle('hidden', tab !== 'expenses');
+      document.getElementById('tab-expenses').classList.toggle('active', tab === 'expenses');
+      document.getElementById('tab-stats').classList.toggle('active', tab === 'stats');
+      renderAll();
+    }
+
+    function renderAll() {
+      renderExpensesView();
+      renderStatsView();
+    }
+
+    function renderExpensesView() {
+      document.getElementById('current-month-label').textContent = formatMonthLabel(selectedMonth);
+
+      const monthExpenses = state.expenses.filter(e => e.date && e.date.startsWith(selectedMonth));
+      const total = monthExpenses.reduce((sum, e) => sum + Number(e.amount), 0);
+
+      document.getElementById('total-spent').textContent = fmtEur(total);
+      document.getElementById('budget-limit-text').textContent = `Limit: ${fmtEur(state.budget)}`;
+
+      const pct = state.budget > 0 ? Math.min(100, Math.round((total / state.budget) * 100)) : 0;
+      const realPct = state.budget > 0 ? Math.round((total / state.budget) * 100) : 0;
+      const bar = document.getElementById('budget-bar');
+      bar.style.width = `${pct}%`;
+      bar.style.background = realPct > 100 ? 'var(--red)' : (realPct > 80 ? 'var(--orange)' : 'var(--primary)');
+      document.getElementById('budget-spent-pct').textContent = `${realPct} % z limitu`;
+
+      // Denný limit do konca mesiaca
+      const dailyBox = document.getElementById('daily-allowance-box');
+      const dailyLbl = document.getElementById('daily-allowance-label');
+      const dailyVal = document.getElementById('daily-allowance-val');
+      const now = new Date();
+      const curYm = getCurrentMonthStr();
+      const remaining = state.budget - total;
+
+      dailyBox.className = 'daily-allowance';
+      if (selectedMonth === curYm) {
+        const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+        const daysLeft = Math.max(1, lastDay - now.getDate() + 1);
+        const perDay = remaining / daysLeft;
+        dailyLbl.textContent = `Zostáva ${daysLeft} ${daysLeft === 1 ? 'deň' : (daysLeft < 5 ? 'dni' : 'dní')} do konca mesiaca`;
+        if (remaining < 0) {
+          dailyBox.classList.add('daily-over');
+          dailyVal.textContent = `Prekročené o ${fmtEur(Math.abs(remaining))}`;
+        } else {
+          dailyBox.classList.add(perDay < 10 ? 'daily-warn' : 'daily-ok');
+          dailyVal.textContent = `${fmtEur(perDay)} / deň`;
+        }
+      } else if (selectedMonth < curYm) {
+        dailyLbl.textContent = 'Uzavretý mesiac';
+        if (remaining >= 0) {
+          dailyBox.classList.add('daily-ok');
+          dailyVal.textContent = `Ušetrené ${fmtEur(remaining)}`;
+        } else {
+          dailyBox.classList.add('daily-over');
+          dailyVal.textContent = `Prekročené o ${fmtEur(Math.abs(remaining))}`;
+        }
+      } else {
+        const [y, m] = selectedMonth.split('-').map(Number);
+        const daysInMonth = new Date(y, m, 0).getDate();
+        dailyBox.classList.add('daily-neutral');
+        dailyLbl.textContent = 'Plánovaný denný rozpočet';
+        dailyVal.textContent = `${fmtEur(state.budget / daysInMonth)} / deň`;
+      }
+
+      // Donut & Legend
+      renderDonutAndLegend(monthExpenses, total);
+
+      // Filter Chips
+      const chipsWrap = document.getElementById('filter-chips');
+      chipsWrap.innerHTML = `<button class="chip ${activeFilter === 'all' ? 'active' : ''}" onclick="setFilter('all')">Všetky</button>` +
+        CATEGORIES.map(c => `<button class="chip ${activeFilter === c.id ? 'active' : ''}" onclick="setFilter('${c.id}')">${c.icon} ${c.name}</button>`).join('');
+
+      // Filtered & Searched List
+      const query = document.getElementById('search-input').value.trim().toLowerCase();
+      let filtered = monthExpenses;
+      if (activeFilter !== 'all') {
+        filtered = filtered.filter(e => e.category === activeFilter);
+      }
+      if (query) {
+        filtered = filtered.filter(e => {
+          const catObj = CATEGORIES.find(c => c.id === e.category);
+          const catName = catObj ? catObj.name.toLowerCase() : '';
+          return (e.note && e.note.toLowerCase().includes(query)) ||
+                 catName.includes(query) ||
+                 String(e.amount).includes(query);
+        });
+      }
+
+      filtered.sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
+
+      const filteredSum = filtered.reduce((s, e) => s + Number(e.amount), 0);
+      document.getElementById('list-title').textContent = (activeFilter !== 'all' || query) ? `Nájdené (${filtered.length})` : `Výdavky (${filtered.length})`;
+      document.getElementById('list-filtered-sum').textContent = filtered.length > 0 ? fmtEur(filteredSum) : '';
+
+      const listEl = document.getElementById('tx-list');
+      if (filtered.length === 0) {
+        listEl.innerHTML = `<div class="empty-state">Žiadne výdavky pre tento výber.</div>`;
+      } else {
+        listEl.innerHTML = filtered.map(e => {
+          const cat = CATEGORIES.find(c => c.id === e.category) || CATEGORIES[5];
+          const dateFmt = e.date.split('-').reverse().join('.');
+          return `
+            <div class="tx-item">
+              <div class="tx-left">
+                <div class="tx-icon" style="background: ${cat.color}18;">${cat.icon}</div>
+                <div class="tx-info">
+                  <div class="tx-title">${escapeHtml(e.note || cat.name)}</div>
+                  <div class="tx-sub">${cat.name} • ${dateFmt}</div>
+                </div>
+              </div>
+              <div class="tx-right">
+                <div class="tx-amount">-${fmtEur(e.amount)}</div>
+                <button class="del-btn" onclick="deleteExpense(${e.id})" aria-label="Zmazať">✕</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function renderDonutAndLegend(monthExpenses, total) {
+      document.getElementById('tx-count-center').textContent = monthExpenses.length;
+      const svg = document.getElementById('donut-svg');
+      const r = 48;
+      const circ = 2 * Math.PI * r;
+
+      const byCat = CATEGORIES.map(c => {
+        const sum = monthExpenses.filter(e => e.category === c.id).reduce((s, e) => s + Number(e.amount), 0);
+        return { ...c, sum };
+      });
+
+      let offset = 0;
+      let circles = `<circle cx="62" cy="62" r="${r}" fill="none" stroke="var(--bg)" stroke-width="14" />`;
+
+      if (total > 0) {
+        byCat.forEach(c => {
+          if (c.sum <= 0) return;
+          const dash = (c.sum / total) * circ;
+          circles += `<circle cx="62" cy="62" r="${r}" fill="none" stroke="${c.color}" stroke-width="14"
+            stroke-dasharray="${dash} ${circ - dash}" stroke-dashoffset="${-offset}"
+            transform="rotate(-90 62 62)" />`;
+          offset += dash;
+        });
+      }
+      svg.innerHTML = circles;
+
+      const sortedLegend = [...byCat].sort((a, b) => b.sum - a.sum);
+      document.getElementById('category-legend').innerHTML = sortedLegend.map(c => `
+        <div class="legend-item">
+          <div class="legend-left">
+            <span class="dot" style="background: ${c.color};"></span>
+            <span>${c.name}</span>
+          </div>
+          <span class="legend-val">${fmtEur(c.sum)}</span>
+        </div>
+      `).join('');
+    }
+
+    function renderStatsView() {
+      // Category selector chips
+      const chipsWrap = document.getElementById('stats-cat-chips');
+      chipsWrap.innerHTML = `<button class="chip ${statsCategory === 'all' ? 'active' : ''}" onclick="setStatsCat('all')">Všetky spolu</button>` +
+        CATEGORIES.map(c => `<button class="chip ${statsCategory === c.id ? 'active' : ''}" onclick="setStatsCat('${c.id}')">${c.icon} ${c.name}</button>`).join('');
+
+      // Last 6 months array
+      const months = [];
+      const [baseY, baseM] = selectedMonth.split('-').map(Number);
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(baseY, baseM - 1 - i, 1);
+        const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        const lbl = d.toLocaleDateString('sk-SK', { month: 'short' }).replace('.', '');
+        const sum = state.expenses
+          .filter(e => e.date && e.date.startsWith(ym) && (statsCategory === 'all' || e.category === statsCategory))
+          .reduce((s, e) => s + Number(e.amount), 0);
+        months.push({ ym, lbl, sum });
+      }
+
+      const maxVal = Math.max(...months.map(m => m.sum), 1);
+      const activeColor = statsCategory === 'all' ? 'var(--primary)' : (CATEGORIES.find(c => c.id === statsCategory)?.color || 'var(--primary)');
+
+      document.getElementById('expense-bars').innerHTML = months.map(m => {
+        const hPct = Math.round((m.sum / maxVal) * 100);
+        return `
+          <div class="bar-col" onclick="selectedMonth='${m.ym}'; switchTab('expenses');">
+            <div class="bar-val">${m.sum > 0 ? Math.round(m.sum) + '€' : '0'}</div>
+            <div class="bar-rect" style="height: ${Math.max(4, hPct)}%; background: ${m.ym === selectedMonth ? activeColor : activeColor + '66'};"></div>
+            <div class="bar-lbl">${m.lbl}</div>
+          </div>
+        `;
+      }).join('');
+
+      const avg = months.reduce((s, m) => s + m.sum, 0) / 6;
+      document.getElementById('stat-avg').textContent = fmtEur(avg);
+
+      const curVal = months[5].sum;
+      const prevVal = months[4].sum;
+      let diffText = '0 %';
+      if (prevVal > 0) {
+        const diff = Math.round(((curVal - prevVal) / prevVal) * 100);
+        diffText = (diff > 0 ? '+' : '') + diff + ' %';
+      } else if (curVal > 0) {
+        diffText = '+100 %';
+      }
+      document.getElementById('stat-diff').textContent = diffText;
+
+      // Savings
+      const totalSav = state.savings.reduce((s, x) => s + Number(x.amount), 0);
+      document.getElementById('total-savings').textContent = fmtEur(totalSav);
+      document.getElementById('savings-goal-text').textContent = `Cieľ: ${fmtEur(state.savingsGoal)}`;
+      const savPct = state.savingsGoal > 0 ? Math.min(100, Math.round((totalSav / state.savingsGoal) * 100)) : 0;
+      document.getElementById('savings-bar').style.width = `${Math.max(0, savPct)}%`;
+      document.getElementById('savings-pct').textContent = `${savPct} % z cieľa`;
+
+      const savList = document.getElementById('savings-list');
+      const sortedSav = [...state.savings].sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
+      if (sortedSav.length === 0) {
+        savList.innerHTML = `<div class="empty-state">Zatiaľ nemáš zaznamenané žiadne úspory.</div>`;
+      } else {
+        savList.innerHTML = sortedSav.map(s => {
+          const isPos = Number(s.amount) >= 0;
+          const dateFmt = s.date.split('-').reverse().join('.');
+          return `
+            <div class="tx-item">
+              <div class="tx-left">
+                <div class="tx-icon" style="background: ${isPos ? 'rgba(52,199,89,0.15)' : 'rgba(255,59,48,0.12)'};">${isPos ? '💰' : '💸'}</div>
+                <div class="tx-info">
+                  <div class="tx-title">${escapeHtml(s.note || (isPos ? 'Vklad do úspor' : 'Výber z úspor'))}</div>
+                  <div class="tx-sub">${dateFmt}</div>
+                </div>
+              </div>
+              <div class="tx-right">
+                <div class="tx-amount" style="color: ${isPos ? 'var(--green)' : 'var(--red)'};">${isPos ? '+' : ''}${fmtEur(s.amount)}</div>
+                <button class="del-btn" onclick="deleteSaving(${s.id})">✕</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function setFilter(catId) {
+      activeFilter = catId;
+      renderExpensesView();
+    }
+
+    function setStatsCat(catId) {
+      statsCategory = catId;
+      renderStatsView();
+    }
+
+    function onSearchInput() {
+      const val = document.getElementById('search-input').value;
+      document.getElementById('search-clear').style.display = val ? 'block' : 'none';
+      renderExpensesView();
+    }
+
+    function clearSearch() {
+      document.getElementById('search-input').value = '';
+      document.getElementById('search-clear').style.display = 'none';
+      renderExpensesView();
+    }
+
+    function editBudget() {
+      const val = prompt('Zadaj mesačný limit výdavkov v €:', state.budget);
+      if (val !== null && !isNaN(parseFloat(val)) && parseFloat(val) >= 0) {
+        state.budget = parseFloat(val);
+        saveState();
+        renderAll();
+      }
+    }
+
+    function editSavingsGoal() {
+      const val = prompt('Zadaj cieľovú sumu úspor v €:', state.savingsGoal);
+      if (val !== null && !isNaN(parseFloat(val)) && parseFloat(val) > 0) {
+        state.savingsGoal = parseFloat(val);
+        saveState();
+        renderAll();
+      }
+    }
+
+    function openAddModal() {
+      document.getElementById('inp-amount').value = '';
+      document.getElementById('inp-note').value = '';
+      const today = new Date().toISOString().slice(0, 10);
+      document.getElementById('inp-date').value = today.startsWith(selectedMonth) ? today : `${selectedMonth}-01`;
+      renderModalCatGrid();
+      openModal('modal-add');
+      setTimeout(() => document.getElementById('inp-amount').focus(), 150);
+    }
+
+    function renderModalCatGrid() {
+      document.getElementById('modal-cat-grid').innerHTML = CATEGORIES.map(c => `
+        <div class="cat-option ${modalSelectedCat === c.id ? 'selected' : ''}" onclick="modalSelectedCat='${c.id}'; renderModalCatGrid();">
+          <span>${c.icon}</span>
+          <span>${c.name}</span>
+        </div>
+      `).join('');
+    }
+
+    function saveExpense() {
+      const amount = parseFloat(document.getElementById('inp-amount').value);
+      if (isNaN(amount) || amount <= 0) {
+        alert('Zadaj platnú sumu väčšiu ako 0.');
+        return;
+      }
+      const note = document.getElementById('inp-note').value.trim();
+      const date = document.getElementById('inp-date').value || `${selectedMonth}-01`;
+
+      state.expenses.push({
+        id: Date.now(),
+        amount,
+        category: modalSelectedCat,
+        note,
+        date
+      });
+      selectedMonth = date.slice(0, 7);
+      saveState();
+      closeModal('modal-add');
+      renderAll();
+    }
+
+    function deleteExpense(id) {
+      state.expenses = state.expenses.filter(e => e.id !== id);
+      saveState();
+      renderAll();
+    }
+
+    // Recurring templates
+    function renderRecurringModal() {
+      const sel = document.getElementById('rec-cat');
+      sel.innerHTML = CATEGORIES.map(c => `<option value="${c.id}">${c.icon} ${c.name}</option>`).join('');
+
+      const list = document.getElementById('recurring-list');
+      if (state.recurring.length === 0) {
+        list.innerHTML = `<div class="empty-state" style="padding: 12px;">Zatiaľ nemáš žiadne pravidelné šablóny.</div>`;
+      } else {
+        list.innerHTML = state.recurring.map(r => {
+          const cat = CATEGORIES.find(c => c.id === r.category) || CATEGORIES[0];
+          return `
+            <div class="tx-item" style="background: var(--bg);">
+              <div class="tx-left">
+                <div class="tx-icon" style="background: ${cat.color}20;">${cat.icon}</div>
+                <div class="tx-info">
+                  <div class="tx-title">${escapeHtml(r.name)}</div>
+                  <div class="tx-sub">${cat.name}</div>
+                </div>
+              </div>
+              <div class="tx-right">
+                <div class="tx-amount">${fmtEur(r.amount)}</div>
+                <button class="del-btn" onclick="deleteRecurring(${r.id})">✕</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function addRecurringTemplate() {
+      const name = document.getElementById('rec-name').value.trim();
+      const amount = parseFloat(document.getElementById('rec-amount').value);
+      const category = document.getElementById('rec-cat').value;
+      if (!name || isNaN(amount) || amount <= 0) {
+        alert('Zadaj názov aj platnú sumu.');
+        return;
+      }
+      state.recurring.push({ id: Date.now(), name, amount, category });
+      document.getElementById('rec-name').value = '';
+      document.getElementById('rec-amount').value = '';
+      saveState();
+      renderRecurringModal();
+    }
+
+    function deleteRecurring(id) {
+      state.recurring = state.recurring.filter(r => r.id !== id);
+      saveState();
+      renderRecurringModal();
+    }
+
+    function applyAllRecurring() {
+      if (state.recurring.length === 0) {
+        alert('Najprv pridaj aspoň jednu pravidelnú položku.');
+        return;
+      }
+      state.recurring.forEach((r, idx) => {
+        state.expenses.push({
+          id: Date.now() + idx,
+          amount: Number(r.amount),
+          category: r.category,
+          note: r.name,
+          date: `${selectedMonth}-01`
+        });
+      });
+      saveState();
+      closeModal('modal-recurring');
+      renderAll();
+    }
+
+    // Savings
+    function setSavType(mult) {
+      savMultiplier = mult;
+      document.getElementById('sav-type-in').classList.toggle('selected', mult === 1);
+      document.getElementById('sav-type-out').classList.toggle('selected', mult === -1);
+    }
+
+    function saveSaving() {
+      const raw = parseFloat(document.getElementById('sav-amount').value);
+      if (isNaN(raw) || raw <= 0) {
+        alert('Zadaj platnú sumu.');
+        return;
+      }
+      const note = document.getElementById('sav-note').value.trim();
+      const today = new Date().toISOString().slice(0, 10);
+      state.savings.push({
+        id: Date.now(),
+        amount: raw * savMultiplier,
+        note,
+        date: today
+      });
+      document.getElementById('sav-amount').value = '';
+      document.getElementById('sav-note').value = '';
+      saveState();
+      closeModal('modal-savings');
+      renderAll();
+    }
+
+    function deleteSaving(id) {
+      state.savings = state.savings.filter(s => s.id !== id);
+      saveState();
+      renderAll();
+    }
+
+    // Modals helpers
+    function openModal(id) {
+      if (id === 'modal-recurring') renderRecurringModal();
+      document.getElementById(id).classList.add('open');
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+    function backdropClose(e, id) {
+      if (e.target.id === id) closeModal(id);
+    }
+
+    // Export / Import / Reset
+    function downloadFile(filename, content, mime) {
+      const blob = new Blob([content], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function exportCSV() {
+      const rows = [['Datum', 'Kategoria', 'Suma_EUR', 'Poznamka']];
+      state.expenses.forEach(e => {
+        const cat = CATEGORIES.find(c => c.id === e.category)?.name || e.category;
+        rows.push([e.date, `"${cat}"`, Number(e.amount).toFixed(2), `"${(e.note || '').replace(/"/g, '""')}"`]);
+      });
+      const csv = '﻿' + rows.map(r => r.join(';')).join('
+');
+      downloadFile(`vydavky_${selectedMonth}.csv`, csv, 'text/csv;charset=utf-8;');
+    }
+
+    function exportJSON() {
+      downloadFile(`moje_vydavky_zaloha_${new Date().toISOString().slice(0,10)}.json`, JSON.stringify(state, null, 2), 'application/json');
+    }
+
+    function importJSON(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          if (data && Array.isArray(data.expenses)) {
+            state = {
+              budget: data.budget ?? 1200,
+              savingsGoal: data.savingsGoal ?? 5000,
+              expenses: data.expenses,
+              recurring: data.recurring || [],
+              savings: data.savings || []
+            };
+            saveState();
+            closeModal('modal-settings');
+            renderAll();
+            alert('Záloha bola úspešne obnovená!');
+          } else {
+            alert('Neplatný súbor zálohy.');
+          }
+        } catch (err) {
+          alert('Chyba pri čítaní súboru.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function clearAllData() {
+      if (confirm('Naozaj chceš vymazať všetky ukážkové dáta a začať s čistým štítom?')) {
+        state = { budget: 1200, savingsGoal: 5000, expenses: [], recurring: [], savings: [] };
+        saveState();
+        closeModal('modal-settings');
+        renderAll();
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+    }
+
+    renderAll();
+  </script>
+</body>
+</html>
